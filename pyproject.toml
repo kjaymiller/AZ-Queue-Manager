@@ -1,0 +1,13 @@
+# Build Basic pyproject.toml file
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "AZQueueManager"
+description = "Plugin Manager for AzureStorageQueues"
+dependencies = ["azure-storage-queue"]
+version = "0.1"
+
+[project.optional-dependencies]
+dev = ["pytest", "black", "isort", "mypy"]
