@@ -24,11 +24,11 @@ class QueueManager:
 
     def next_message(
         self,
-        message_transformer: typing.Optional[Callable[[str], dict]] = lambda message: {
+        message_transformer: Callable[str, dict] = lambda message: {
             "text": message
         },
-        delete_after: typing.Optional[bool] = True,
-        preview_mode: typing.Optional[bool] = False,
+        delete_after: bool = True,
+        preview_mode: bool = False,
     ) -> azure.storage.queue.QueueMessage:
         """
         Loads the next message in the queue.
@@ -52,7 +52,7 @@ class QueueManager:
 
         return message
 
-    def queue_message(self, message: str|json, message_transformer) -> azure.storage.queue.QueueMessage
+    def queue_message(self, message: str|dict[any, any], message_transformer) -> azure.storage.queue.QueueMessage
         self.queue.send_message(message)
 
 
