@@ -6,11 +6,21 @@ import azure.storage.queue
 
 
 class QueueManager:
-    def __init__(self, storage_auth: storage.Auth, twitter_auth: twitter.Auth):
-        self.twitter_auth = twitter_auth
+    def __init__(self, storage_auth: storage.Auth):
         self.queue = storage_auth.Client
-        self.twitterv1 = twitter_auth.API
-        self.twitterv2 = twitter_auth.Client
+
+    def list_messages(
+        max_messages: int | None = None
+    ):
+        """
+        Returns a list of the messages in the queue without modifying the queue.
+
+        This is a wrapper for azure.storage.queue.QueueClient.peek_messages
+        """
+
+        return self.queue.peek_messages(max_messages=max)
+
+
 
     def send_next_message(
         self,
@@ -55,3 +65,12 @@ class QueueManager:
 
     def queue_message(self, message: str|json, message_transformer) -> azure.storage.queue.QueueMessage
         self.queue.send_message(message)
+
+
+    # TODO: Add a validator for the message_transformer. This ensures that the messages_will be processed correctly.
+
+    # TODO: Add input tranformers. This will allow the user to transform the input before it is sent to the queue.
+
+    # TODO: Add output transformers. This will allow the user to transform the output before it is returned to the user.
+
+    # TODO: Add in-place transformers. These will transform the message and then send it back to the queue in place.
