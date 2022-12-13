@@ -24,7 +24,7 @@ class QueueManager:
 
     def next_message(
         self,
-        message_transformer: Callable[str, dict] = lambda message: {
+        message_transformer: Callable[...] = lambda message: {
             "text": message
         },
         delete_after: bool = True,
