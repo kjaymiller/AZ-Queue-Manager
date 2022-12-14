@@ -1,4 +1,3 @@
-import typing
 from typing import Callable
 
 from . import storage, twitter
@@ -6,8 +5,18 @@ import azure.storage.queue
 
 
 class QueueManager:
-    def __init__(self, storage_auth: storage.Auth):
+    def __init__(
+        self,
+        storage_auth: storage.Auth,
+        input_transformer: Callable[...]|None = None,
+        output_transformer: Callable[...]| None = None,
         self.queue = storage_auth.Client
+    )
+        self.input_transformer = input_transformer
+        self.output_transformer = output_transformer
+
+    def __repr__(self):
+        return f"QueueManager({self.queue=})"
 
     def list_messages(
         self,
@@ -24,9 +33,6 @@ class QueueManager:
 
     def next_message(
         self,
-        message_transformer: Callable[...] = lambda message: {
-            "text": message
-        },
         delete_after: bool = True,
         preview_mode: bool = False,
     ) -> azure.storage.queue.QueueMessage:
@@ -42,7 +48,8 @@ class QueueManager:
             message = self.queue.receive_message()
 
         # Transform the message
-        transformed_message = message_transformer(message["content"])
+        if self.output_transformer:
+            transformed_message = self.output_transformaer.transform_one(message["content"])
 
         if preview_mode:
             print(f"PREVIEW: {message=} -> {transformed_message=}")
@@ -51,6 +58,13 @@ class QueueManager:
             self.queue.delete_message(message.id, message.pop_receipt)
 
         return message
+
+    def next_messages(
+        count: int | None=None,
+        delete_after: bool = True,
+    ):
+        """Loads the next messages in the queue."""
+        for message in self.recieve_messages(max_messages=count):
 
     def queue_message(self, message: str|dict[any, any], message_transformer) -> azure.storage.queue.QueueMessage
         self.queue.send_message(message)
