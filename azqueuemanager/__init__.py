@@ -1,12 +1,14 @@
 from . import queue
 from .extension import ExtensionBaseClass
 import azure.storage.queue
+import azure.functions
 
 
 class QueueManager:
     def __init__(
         self,
         queue: queue.QueueClient,
+        has_queue_trigger: bool = False,
         input_transformer: ExtensionBaseClass | None = None,
         output_transformer: ExtensionBaseClass | None = None,
     ):
@@ -61,8 +63,7 @@ class QueueManager:
         message = self.queue.client.receive_message()
 
         # Transform the message
-        if self.output_transformer:
-            transformed_message = self.output_transformer.transform_out([message]).next()
+        self.transform_message(message)
 
         if not preview_mode and delete_after:
             self.queue.client.delete_message(message.id, message.pop_receipt)
@@ -76,7 +77,11 @@ class QueueManager:
     ):
         """Loads the next messages in the queue."""
         output_messages = self.queue.client.receive_messages(max_messages=count)
-        output = self.output_transformer.transform_out(output_messages)
+        if self.output_transformer:
+            output = self.output_transformer.transform_out(output_messages)
+        
+        else:
+            output = output_messages
         
         if delete_after:
             for message in output_messages:
@@ -95,6 +100,14 @@ class QueueManager:
 
         return [self.queue.client.send_message(content=msg) for msg in messages]
 
+
+    def transform_message(self, message: azure.functions.QueueMessage) -> any:
+        logging.info(f"Transforming message {message=}")
+        if self.output_transformer:
+            return self.output_transformer.transform_out([message.get_body().decode('utf-8')]).next()
+
+        logging.info("No Output Transformer. Returning message %s", message)
+        return message
 
     # TODO: Add a validator for the message_transformer. This ensures that the messages_will be processed correctly.
 
