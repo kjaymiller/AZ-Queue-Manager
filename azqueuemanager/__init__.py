@@ -27,8 +27,25 @@ class QueueManager:
         This is a wrapper for azure.storage.queue.QueueClient.peek_messages
         """
 
-        return self.queue.peek_messages(max_messages=max_messages)
+        return self.queue.client.peek_messages(max_messages=max_messages)
 
+    def preview_message(
+        self,
+    ) -> str:
+        """
+        Returns the next message in the queue without modifying the queue.
+        """
+
+        message = self.list_messages(1)[0]
+        print(message)
+
+        if self.output_transformer:
+            transformed_message = self.output_transformer.transform_preview(message)
+            
+        else:
+            transformed_message = message.content
+
+        return f"PREVIEW: {message=} -> {transformed_message=}"
 
     def next_message(
         self,
@@ -41,20 +58,14 @@ class QueueManager:
         If preview_mode is True, the message will be peeked and the deque_count will not change.
         If delere_after is True, the message will be deleted after it is processed.
         """
-        if preview_mode:
-            message = self.list_messages(1)[0]
-        else:
-            message = self.queue.receive_message()
+        message = self.queue.client.receive_message()
 
         # Transform the message
         if self.output_transformer:
             transformed_message = self.output_transformer.transform_out([message]).next()
 
-        if preview_mode:
-            print(f"PREVIEW: {message=} -> {transformed_message=}")
-
         if not preview_mode and delete_after:
-            self.queue.delete_message(message.id, message.pop_receipt)
+            self.queue.client.delete_message(message.id, message.pop_receipt)
 
         return message
 
@@ -62,23 +73,25 @@ class QueueManager:
         self,
         count: int | None=None,
         delete_after: bool = True,
-        preview_mode: bool = False,
     ):
         """Loads the next messages in the queue."""
-        output_messages = self.queue.receive_messages(count)
-        output = self.output_transformer.transform_many(output_messages)
+        output_messages = self.queue.client.receive_messages(max_messages=count)
+        output = self.output_transformer.transform_out(output_messages)
         
         if delete_after:
             for message in output_messages:
-                self.queue.delete_message(message.id, message.pop_receipt)
+                self.queue.client.delete_message(message.id, message.pop_receipt)
 
         return output
 
     def queue_messages(self, messages: list[str] | None = None) -> azure.storage.queue.QueueMessage:
+        """
+        enqueue the messages into the queue_client.
+        If there is a transformer, transform using the `transform_in` method for the extensions
+        """
+
         if self.input_transformer:
             messages = self.input_transformer.transform_in()
-
-        print(f"adding {messages=} to {self.queue=}") 
 
         return [self.queue.client.send_message(content=msg) for msg in messages]
 

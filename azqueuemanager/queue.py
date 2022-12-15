@@ -14,8 +14,6 @@ class QueueClient:
         self.queue_name = queue_name
         self.client = client
 
-        print(self.client)
-
         if not self.exists:
             self.client.create_queue()
 
@@ -47,7 +45,10 @@ class QueueClient:
             queue_name
         )
 
-        client.create_queue()
+        try:
+            client.create_queue()
+        except:
+            pass
  
 
         return cls(client=client, queue_name=queue_name)

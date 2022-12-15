@@ -14,9 +14,9 @@ class ExtensionBaseClass(ABC):
         pass
 
     @abstractmethod
-    def transform_one(self, data: str):
+    def transform_preview(self, data: str):
         pass
 
     @abstractmethod
-    def transform_many(self, data: list[str]):
+    def transform_out(self, data: list[str]):
         pass
