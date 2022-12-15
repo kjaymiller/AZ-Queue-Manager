@@ -1,13 +1,17 @@
-# Build Basic pyproject.toml file
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
-[project]
-name = "AZQueueManager"
-description = "Plugin Manager for AzureStorageQueues"
-dependencies = ["azure-storage-queue"]
-version = "0.1"
 
-[project.optional-dependencies]
-dev = ["pytest", "black", "isort", "mypy"]
+[project]
+name = "azqueuemanager"
+description = "Storage Queue Input-Output Manager for Azure Storage Queue"
+dependencies = ['azure-storage-queue']
+readme = "README.md"
+license = { text = "MIT"}
+classifiers = [
+    "Programming Language :: Python :: 3",
+]
+keywords = ["azqueuemanager"]
+requires-python = ">=3.10"
+version = "0.0.1"

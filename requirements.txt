@@ -34,7 +34,7 @@ iniconfig==1.1.1
     # via pytest
 isodate==0.6.1
     # via msrest
-isort==5.11.1
+isort==5.11.2
     # via AZQueueManager (pyproject.toml)
 msrest==0.7.1
     # via azure-storage-queue

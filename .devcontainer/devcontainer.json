@@ -4,7 +4,8 @@
 	"name": "Python 3",
 	"image": "mcr.microsoft.com/devcontainers/python:3.10",
 	"features": {
-		"ghcr.io/devcontainers-contrib/features/pre-commit:1": {}
+		"ghcr.io/devcontainers-contrib/features/pre-commit:1": {},
+		"ghcr.io/devcontainers-contrib/features/twine": {}
 	}
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
@@ -24,7 +25,8 @@
 				"ms-python.vscode-pylance",
 				"eamodio.gitlens",
 				"GitHub.copilot",
-				"GitHub.copilot-labs"
+				"GitHub.copilot-labs",
+				"ms-vscode.vscode-node-azure-pack"
 			]
 		}
 	}
