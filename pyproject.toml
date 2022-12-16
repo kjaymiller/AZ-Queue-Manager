@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "azqueuemanager"
 description = "Storage Queue Input-Output Manager for Azure Storage Queue"
-dependencies = ['azure-storage-queue']
+dependencies = ['azure-storage-queue', 'azure-functions']
 readme = "README.md"
 license = { text = "MIT"}
 classifiers = [
@@ -14,4 +14,4 @@ classifiers = [
 ]
 keywords = ["azqueuemanager"]
 requires-python = ">=3.10"
-version = "0.0.4"
+version = "0.0.6"
